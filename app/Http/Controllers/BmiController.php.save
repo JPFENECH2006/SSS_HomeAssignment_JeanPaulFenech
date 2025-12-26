@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Bmi;
+use App\Services\BmiService;
+use Illuminate\Http\Request;
+
+class BmiController extends Controller
+{
+    public function index()
+    {
+        return view('bmi.index');
+    }
+
+    public function calculate(Request $request, BmiService $bmiService)
+    {
+        $data = $request->validate([
+            'height_cm' => ['required', 'numeric', 'min:80', 'max:250'],
+            'weight_kg' => ['required', 'numeric', 'min:20', 'max:300'],
+        ]);
+
+        $bmiValue = $bmiService->calculate(
+            $data['height_cm'],
+            $data['weight_kg']
+        );
+
+        $category = $bmiService->category($bmiValue);
+
+        $user = $request->user();
+
+        // store height & weight on user
+        $user->update($data);
+
+        // store BMI record
+        Bmi::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'bmi_value' => $bmiValue,
+                'category'  => $category,
+            ]
+        );
+
+        return redirect()
+            ->route('bmi.index')
+            ->with('success', "Your BMI is $bmiValue ($category)");
+    }
