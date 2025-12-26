@@ -11,17 +11,9 @@ class DietController extends Controller
     {
         $query = Diet::query();
 
-        // Search by name
+        // Optional search
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
-        }
-
-        // Filter by logged-in user's BMI (if exists)
-        if (auth()->check() && auth()->user()->bmi) {
-            $bmi = auth()->user()->bmi->bmi_value;
-
-            $query->where('min_bmi', '<=', $bmi)
-                  ->where('max_bmi', '>=', $bmi);
         }
 
         $diets = $query->get();
@@ -40,12 +32,13 @@ class DietController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'min_bmi' => 'required|numeric',
-            'max_bmi' => 'required|numeric',
+            'max_bmi' => 'required|numeric|gte:min_bmi',
         ]);
 
         Diet::create($data);
 
-        return redirect()->route('diets.index');
+        return redirect()->route('diets.index')
+            ->with('success', 'Diet created successfully');
     }
 
     public function edit(Diet $diet)
@@ -59,17 +52,20 @@ class DietController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'min_bmi' => 'required|numeric',
-            'max_bmi' => 'required|numeric',
+            'max_bmi' => 'required|numeric|gte:min_bmi',
         ]);
 
         $diet->update($data);
 
-        return redirect()->route('diets.index');
+        return redirect()->route('diets.index')
+            ->with('success', 'Diet updated successfully');
     }
 
     public function destroy(Diet $diet)
     {
         $diet->delete();
-        return redirect()->route('diets.index');
+
+        return redirect()->route('diets.index')
+            ->with('success', 'Diet deleted successfully');
     }
 }

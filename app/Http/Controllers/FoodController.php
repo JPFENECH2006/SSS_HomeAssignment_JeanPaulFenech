@@ -21,25 +21,28 @@ class FoodController extends Controller
         return view('foods.create', compact('diets'));
     }
 
-    public function store(Request $request, FoodApiService $foodApi)
-    {
-        $data = $request->validate([
-            'diet_id' => 'required|exists:diets,id',
-            'name'    => 'required|string|max:255',
+public function store(Request $request, FoodApiService $foodApi)
+{
+    $data = $request->validate([
+        'diet_id' => 'required|exists:diets,id',
+        'name'    => 'required|string|max:255',
+    ]);
+
+    $nutrition = $foodApi->fetchNutrition($data['name']);
+
+    dd($nutrition); 
+
+    if (!$nutrition) {
+        return back()->withErrors([
+            'name' => 'Food not found in external nutrition database',
         ]);
-
-        $nutrition = $foodApi->fetchNutrition($data['name']);
-
-        if (!$nutrition) {
-            return back()->withErrors([
-                'name' => 'Food not found in external nutrition database',
-            ]);
-        }
-
-        Food::create(array_merge($data, $nutrition));
-
-        return redirect()->route('foods.index');
     }
+
+    Food::create(array_merge($data, $nutrition));
+
+    return redirect()->route('foods.index');
+}
+
 
     public function edit(Food $food)
     {

@@ -11,11 +11,11 @@ class FoodApiService
         $response = Http::get(
             'https://world.openfoodfacts.org/cgi/search.pl',
             [
-                'search_terms' => $foodName,
-                'search_simple' => 1,
-                'action' => 'process',
-                'json' => 1,
-                'page_size' => 1,
+                'search_terms'   => $foodName,
+                'search_simple'  => 1,
+                'action'         => 'process',
+                'json'           => 1,
+                'page_size'      => 1,
             ]
         );
 
@@ -24,12 +24,16 @@ class FoodApiService
         }
 
         $product = $response['products'][0];
+        $nutriments = $product['nutriments'] ?? [];
 
         return [
-            'calories' => $product['nutriments']['energy-kcal_100g'] ?? null,
-            'protein'  => $product['nutriments']['proteins_100g'] ?? null,
-            'carbs'    => $product['nutriments']['carbohydrates_100g'] ?? null,
-            'fats'     => $product['nutriments']['fat_100g'] ?? null,
+            // Energy
+            'calories' => $nutriments['energy-kcal_100g'] ?? 0,
+
+            // Macros (ALWAYS default to 0, never null)
+            'protein'  => $nutriments['proteins_100g'] ?? 0,
+            'carbs'    => $nutriments['carbohydrates_100g'] ?? 0,
+            'fats'     => $nutriments['fat_100g'] ?? 0,
         ];
     }
 }

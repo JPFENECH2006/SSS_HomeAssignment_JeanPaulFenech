@@ -1,30 +1,54 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <title>Nutrition App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Fonts only (no Vite, no npm) -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-    <nav style="padding:10px; border-bottom:1px solid #ccc;">
-        <a href="/">Home</a> |
-        <a href="/bmi">BMI</a> |
-        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Nutrition App</a>
+
+        <ul class="navbar-nav me-auto">
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('bmi.index') }}">BMI</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('diets.index') }}">Diets</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('foods.index') }}">Foods</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('meals.index') }}">Meals</a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link fw-bold text-warning" href="{{ route('mealplan.index') }}">
+            Meal Plan
+        </a>
+    </li>
+</ul>
+
+
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit">Logout</button>
+            <button class="btn btn-outline-light btn-sm">Logout</button>
         </form>
-    </nav>
+    </div>
+</nav>
 
-    <main style="padding:20px;">
-        {{ $slot }}
-    </main>
+<div class="container mt-4">
+    @yield('content')
+</div>
 
 </body>
 </html>

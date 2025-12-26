@@ -1,15 +1,36 @@
-<x-app-layout>
-    <h2>Edit Diet</h2>
+@extends('layouts.app')
 
-    <form method="POST" action="{{ route('diets.update', $diet) }}">
-        @csrf
-        @method('PUT')
+@section('content')
+<div class="card shadow col-md-6 mx-auto">
+    <div class="card-body">
+        <h3>Edit Diet</h3>
 
-        <input name="name" value="{{ $diet->name }}"><br>
-        <textarea name="description">{{ $diet->description }}</textarea><br>
-        <input name="min_bmi" value="{{ $diet->min_bmi }}"><br>
-        <input name="max_bmi" value="{{ $diet->max_bmi }}"><br>
+        <form method="POST" action="{{ route('diets.update', $diet) }}">
+            @csrf
+            @method('PUT')
 
-        <button type="submit">Update</button>
-    </form>
-</x-app-layout>
+            <div class="mb-3">
+                <label>Name</label>
+                <input name="name" value="{{ $diet->name }}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Description</label>
+                <textarea name="description" class="form-control">{{ $diet->description }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label>Min BMI</label>
+                <input name="min_bmi" value="{{ $diet->min_bmi }}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label>Max BMI</label>
+                <input name="max_bmi" value="{{ $diet->max_bmi }}" class="form-control">
+            </div>
+
+            <button class="btn btn-primary">Update</button>
+        </form>
+    </div>
+</div>
+@endsection

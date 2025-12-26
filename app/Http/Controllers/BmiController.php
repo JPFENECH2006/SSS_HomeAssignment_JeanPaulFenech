@@ -29,7 +29,6 @@ class BmiController extends Controller
 
         $user = $request->user();
 
-        // Save height & weight on user
         $user->update($data);
 
         // Save BMI record

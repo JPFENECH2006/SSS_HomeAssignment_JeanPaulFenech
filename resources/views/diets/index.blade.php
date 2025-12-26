@@ -1,37 +1,41 @@
-<x-app-layout>
-    <h2>Diets</h2>
+@extends('layouts.app')
 
-    <!-- Search Form -->
-    <form method="GET" action="{{ route('diets.index') }}">
-        <input
-            type="text"
-            name="search"
-            placeholder="Search diets (e.g. Keto)"
-            value="{{ request('search') }}"
-        >
-        <button type="submit">Search</button>
-    </form>
+@section('content')
+<div class="card shadow">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+            <h3>Diets</h3>
+            <a href="{{ route('diets.create') }}" class="btn btn-success">Add Diet</a>
+        </div>
 
-    <hr>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>BMI Range</th>
+                    <th width="200">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($diets as $diet)
+                    <tr>
+                        <td>{{ $diet->name }}</td>
+                        <td>{{ $diet->min_bmi }} – {{ $diet->max_bmi }}</td>
+                        <td>
+                            <a href="{{ route('diets.edit', $diet) }}" class="btn btn-warning btn-sm">Edit</a>
 
-    <a href="{{ route('diets.create') }}">Add Diet</a>
-
-    <ul>
-        @foreach($diets as $diet)
-            <li>
-                <strong>{{ $diet->name }}</strong>
-                (BMI {{ $diet->min_bmi }} - {{ $diet->max_bmi }})
-
-                <a href="{{ route('diets.edit', $diet) }}">Edit</a>
-
-                <form method="POST"
-                      action="{{ route('diets.destroy', $diet) }}"
-                      style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit">Delete</button>
-                </form>
-            </li>
-        @endforeach
-    </ul>
-</x-app-layout>
+                            <form method="POST" action="{{ route('diets.destroy', $diet) }}" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="3" class="text-center">No diets found</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
