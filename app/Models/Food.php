@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Food extends Model
 {
+
+        protected $table = 'foods';
+
     protected $fillable = [
         'diet_id',
         'name',
