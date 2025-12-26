@@ -7,9 +7,25 @@ use Illuminate\Http\Request;
 
 class DietController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $diets = Diet::all();
+        $query = Diet::query();
+
+        // Search by name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter by logged-in user's BMI (if exists)
+        if (auth()->check() && auth()->user()->bmi) {
+            $bmi = auth()->user()->bmi->bmi_value;
+
+            $query->where('min_bmi', '<=', $bmi)
+                  ->where('max_bmi', '>=', $bmi);
+        }
+
+        $diets = $query->get();
+
         return view('diets.index', compact('diets'));
     }
 
