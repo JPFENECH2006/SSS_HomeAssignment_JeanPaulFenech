@@ -27,10 +27,10 @@ class FoodApiService
         $nutriments = $product['nutriments'] ?? [];
 
         return [
-            // Energy
+         
             'calories' => $nutriments['energy-kcal_100g'] ?? 0,
 
-            // Macros (ALWAYS default to 0, never null)
+            
             'protein'  => $nutriments['proteins_100g'] ?? 0,
             'carbs'    => $nutriments['carbohydrates_100g'] ?? 0,
             'fats'     => $nutriments['fat_100g'] ?? 0,

@@ -3,6 +3,14 @@
 @section('content')
 <div class="container mt-4">
 
+    {{-- Success Message --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <div class="card shadow">
         <div class="card-body">
 
@@ -13,6 +21,17 @@
                 </a>
             </div>
 
+            {{-- Order By --}}
+            <form method="GET" class="mb-3">
+                <select name="order" class="form-select w-auto d-inline">
+                    <option value="">Order by</option>
+                    <option value="protein">Protein</option>
+                    <option value="carbs">Carbs</option>
+                    <option value="fats">Fats</option>
+                </select>
+                <button class="btn btn-secondary btn-sm">Apply</button>
+            </form>
+
             <table class="table table-striped table-bordered align-middle">
                 <thead class="table-dark">
                     <tr>
@@ -22,7 +41,7 @@
                         <th>Fat (g)</th>
                         <th>Carbs (g)</th>
                         <th>Diet</th>
-                        <th class="text-center" width="160">Actions</th>
+                        <th class="text-center" width="220">Actions</th>
                     </tr>
                 </thead>
 
@@ -30,16 +49,21 @@
                     @forelse ($foods as $food)
                         <tr>
                             <td>{{ $food->name }}</td>
-                            <td>{{ $food->calories ?? '-' }}</td>
-                            <td>{{ $food->protein ?? '-' }}</td>
-                            <td>{{ $food->fats ?? '-' }}</td>
-                            <td>{{ $food->carbs ?? '-' }}</td>
+                            <td>{{ $food->calories }}</td>
+                            <td>{{ $food->protein }}</td>
+                            <td>{{ $food->fats }}</td>
+                            <td>{{ $food->carbs }}</td>
                             <td>
                                 <span class="badge bg-primary">
                                     {{ $food->diet->name ?? 'N/A' }}
                                 </span>
                             </td>
                             <td class="text-center">
+                                <a href="{{ route('foods.show', $food) }}"
+                                   class="btn btn-info btn-sm">
+                                    View
+                                </a>
+
                                 <a href="{{ route('foods.edit', $food) }}"
                                    class="btn btn-warning btn-sm">
                                     Edit
@@ -51,7 +75,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-danger btn-sm"
-                                            onclick="return confirm('Delete this food?')">
+                                            onclick="return confirm('Food deleted successfully')">
                                         Delete
                                     </button>
                                 </form>
@@ -60,7 +84,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="text-center text-muted">
-                                No foods found. Click <strong>Add Food</strong> to create one.
+                                No foods found
                             </td>
                         </tr>
                     @endforelse

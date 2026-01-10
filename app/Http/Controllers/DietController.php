@@ -11,9 +11,14 @@ class DietController extends Controller
     {
         $query = Diet::query();
 
-        // Optional search
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($request->filled('order')) {
+            if ($request->order === 'bmi_low') {
+                $query->orderBy('min_bmi');
+            }
+
+            if ($request->order === 'bmi_high') {
+                $query->orderByDesc('max_bmi');
+            }
         }
 
         $diets = $query->get();
@@ -37,8 +42,15 @@ class DietController extends Controller
 
         Diet::create($data);
 
-        return redirect()->route('diets.index')
-            ->with('success', 'Diet created successfully');
+        return redirect()
+            ->route('diets.index')
+            ->with('success', 'Diet added successfully');
+    }
+
+    public function show(Diet $diet)
+    {
+        $diet->load('foods');
+        return view('diets.show', compact('diet'));
     }
 
     public function edit(Diet $diet)
@@ -57,7 +69,8 @@ class DietController extends Controller
 
         $diet->update($data);
 
-        return redirect()->route('diets.index')
+        return redirect()
+            ->route('diets.index')
             ->with('success', 'Diet updated successfully');
     }
 
@@ -65,7 +78,8 @@ class DietController extends Controller
     {
         $diet->delete();
 
-        return redirect()->route('diets.index')
+        return redirect()
+            ->route('diets.index')
             ->with('success', 'Diet deleted successfully');
     }
 }

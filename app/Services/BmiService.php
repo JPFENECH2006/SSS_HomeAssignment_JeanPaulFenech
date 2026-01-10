@@ -4,19 +4,25 @@ namespace App\Services;
 
 class BmiService
 {
-    public function calculate(float $heightCm, float $weightKg): float
+    /**
+     * Calculate BMI given height in cm and weight in kg
+     */
+    public function calculate($height_cm, $weight_kg)
     {
-        $heightM = $heightCm / 100;
-        return round($weightKg / ($heightM * $heightM), 2);
+        $height_m = $height_cm / 100; // convert cm to meters
+        return $weight_kg / ($height_m ** 2);
     }
 
-    public function category(float $bmi): string
+    /**
+     * Determine BMI category
+     */
+    public function category($bmi)
     {
-        return match (true) {
-            $bmi < 18.5 => 'Underweight',
-            $bmi < 25   => 'Normal',
-            $bmi < 30   => 'Overweight',
-            default     => 'Obese',
-        };
+        if ($bmi < 18.5) return 'Underweight';
+        if ($bmi < 25) return 'Normal';
+        if ($bmi < 30) return 'Overweight';
+        if ($bmi < 35) return 'Obesity I';
+        if ($bmi < 40) return 'Obesity II';
+        return 'Obesity III';
     }
 }

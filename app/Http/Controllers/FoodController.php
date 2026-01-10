@@ -9,9 +9,17 @@ use Illuminate\Http\Request;
 
 class FoodController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $foods = Food::with('diet')->get();
+        $query = Food::with('diet');
+
+        if ($request->filled('order')) {
+            if (in_array($request->order, ['protein', 'carbs', 'fats'])) {
+                $query->orderByDesc($request->order);
+            }
+        }
+
+        $foods = $query->get();
         return view('foods.index', compact('foods'));
     }
 
@@ -21,28 +29,33 @@ class FoodController extends Controller
         return view('foods.create', compact('diets'));
     }
 
-public function store(Request $request, FoodApiService $foodApi)
-{
-    $data = $request->validate([
-        'diet_id' => 'required|exists:diets,id',
-        'name'    => 'required|string|max:255',
-    ]);
-
-    $nutrition = $foodApi->fetchNutrition($data['name']);
-
-    dd($nutrition); 
-
-    if (!$nutrition) {
-        return back()->withErrors([
-            'name' => 'Food not found in external nutrition database',
+    public function store(Request $request, FoodApiService $foodApi)
+    {
+        $data = $request->validate([
+            'diet_id' => 'required|exists:diets,id',
+            'name' => 'required|string|max:255',
         ]);
+
+        $nutrition = $foodApi->fetchNutrition($data['name']);
+
+        if (!$nutrition) {
+            return back()->withErrors([
+                'name' => 'Food not found in external nutrition database',
+            ])->withInput();
+        }
+
+        Food::create(array_merge($data, $nutrition));
+
+        return redirect()
+            ->route('foods.index')
+            ->with('success', 'Food added successfully');
     }
 
-    Food::create(array_merge($data, $nutrition));
-
-    return redirect()->route('foods.index');
-}
-
+    public function show(Food $food)
+    {
+        $food->load('diet', 'meals');
+        return view('foods.show', compact('food'));
+    }
 
     public function edit(Food $food)
     {
@@ -54,22 +67,26 @@ public function store(Request $request, FoodApiService $foodApi)
     {
         $data = $request->validate([
             'diet_id' => 'required|exists:diets,id',
-            'name'    => 'required|string|max:255',
-            'calories'=> 'nullable|numeric',
-            'protein' => 'nullable|numeric',
-            'carbs'   => 'nullable|numeric',
-            'fats'    => 'nullable|numeric',
+            'name' => 'required|string|max:255',
+            'calories' => 'required|numeric',
+            'protein' => 'required|numeric',
+            'carbs' => 'required|numeric',
+            'fats' => 'required|numeric',
         ]);
 
         $food->update($data);
 
-        return redirect()->route('foods.index');
+        return redirect()
+            ->route('foods.index')
+            ->with('success', 'Food updated successfully');
     }
 
     public function destroy(Food $food)
     {
         $food->delete();
-        return redirect()->route('foods.index');
+
+        return redirect()
+            ->route('foods.index')
+            ->with('success', 'Food deleted successfully');
     }
 }
-

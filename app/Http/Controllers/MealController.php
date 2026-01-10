@@ -8,9 +8,15 @@ use Illuminate\Http\Request;
 
 class MealController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $meals = Meal::with('food')->get();
+        $query = Meal::with('food.diet');
+
+        if ($request->filled('order')) {
+            $query->orderBy('meal_type');
+        }
+
+        $meals = $query->get();
         return view('meals.index', compact('meals'));
     }
 
@@ -24,13 +30,21 @@ class MealController extends Controller
     {
         $data = $request->validate([
             'food_id' => 'required|exists:foods,id',
-            'meal_type' => 'required|string',
-            'portion_size' => 'required|string',
+            'meal_type' => 'required|in:Breakfast,Lunch,Dinner',
+            'portion_size' => 'required|integer|min:1',
         ]);
 
         Meal::create($data);
 
-        return redirect()->route('meals.index');
+        return redirect()
+            ->route('meals.index')
+            ->with('success', 'Meal added successfully');
+    }
+
+    public function show(Meal $meal)
+    {
+        $meal->load('food.diet');
+        return view('meals.show', compact('meal'));
     }
 
     public function edit(Meal $meal)
@@ -43,19 +57,23 @@ class MealController extends Controller
     {
         $data = $request->validate([
             'food_id' => 'required|exists:foods,id',
-            'meal_type' => 'required|string',
-            'portion_size' => 'required|string',
+            'meal_type' => 'required|in:Breakfast,Lunch,Dinner',
+            'portion_size' => 'required|integer|min:1',
         ]);
 
         $meal->update($data);
 
-        return redirect()->route('meals.index');
+        return redirect()
+            ->route('meals.index')
+            ->with('success', 'Meal updated successfully');
     }
 
     public function destroy(Meal $meal)
     {
         $meal->delete();
-        return redirect()->route('meals.index');
+
+        return redirect()
+            ->route('meals.index')
+            ->with('success', 'Meal deleted successfully');
     }
 }
-

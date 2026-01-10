@@ -17,7 +17,7 @@ class Food extends Model
         'calories',
         'protein',
         'carbs',
-        'fats',
+        'fats',  
     ];
 
     public function diet(): BelongsTo

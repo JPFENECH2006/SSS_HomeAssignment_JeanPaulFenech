@@ -35,7 +35,7 @@
 
 <hr>
 
-<h3>Daily Nutrition Totals</h3>
+<h3>Nutrition Totals</h3>
 <ul>
     <li><strong>Calories:</strong> {{ $totals['calories'] }}</li>
     <li><strong>Protein:</strong> {{ $totals['protein'] }} g</li>
