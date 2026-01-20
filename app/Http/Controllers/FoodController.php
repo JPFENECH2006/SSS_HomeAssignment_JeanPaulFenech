@@ -31,19 +31,25 @@ class FoodController extends Controller
 
     public function store(Request $request, FoodApiService $foodApi)
     {
+        // Step 1: Validate user input
         $data = $request->validate([
             'diet_id' => 'required|exists:diets,id',
-            'name' => 'required|string|max:255',
+            'name'    => 'required|string|max:255',
         ]);
 
+        // Step 2: Fetch nutrition from external API
         $nutrition = $foodApi->fetchNutrition($data['name']);
 
-        if (!$nutrition) {
-            return back()->withErrors([
-                'name' => 'Food not found in external nutrition database',
-            ])->withInput();
+        // Step 3: Handle food not found OR nutrition missing
+        if ($nutrition === null) {
+            return back()
+                ->withErrors([
+                    'name' => 'Food not found or nutritional data is unavailable.',
+                ])
+                ->withInput();
         }
 
+        // Step 4: Store combined data
         Food::create(array_merge($data, $nutrition));
 
         return redirect()
@@ -66,12 +72,12 @@ class FoodController extends Controller
     public function update(Request $request, Food $food)
     {
         $data = $request->validate([
-            'diet_id' => 'required|exists:diets,id',
-            'name' => 'required|string|max:255',
+            'diet_id'  => 'required|exists:diets,id',
+            'name'     => 'required|string|max:255',
             'calories' => 'required|numeric',
-            'protein' => 'required|numeric',
-            'carbs' => 'required|numeric',
-            'fats' => 'required|numeric',
+            'protein'  => 'required|numeric',
+            'carbs'    => 'required|numeric',
+            'fats'     => 'required|numeric',
         ]);
 
         $food->update($data);
